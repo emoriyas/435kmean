@@ -40,8 +40,10 @@ def getDist(x_i, x_c):
 
 def soft(x_i, x_c, b):
     expo = -1 * b * math.pow(getDist(x_i, x_c), 2)
+    print("expo:", expo)
     #print("dist:", getDist(x_i, x_c))
-    ret = (0.5) * math.exp(expo)
+    ret = math.exp(expo)
+    print("ret:", ret)
     return(ret)
 
 ###################################################################
@@ -81,16 +83,16 @@ def centerOfGravity(mat, clustering, c):
 
     for i in range (0, len(mat)):
         #print(mat[i])
-        ptot = ptot = clustering[i][c]
-        #xtot = xtot + mat[i][0]
-        #ytot = ytot + mat[i][1]
+        ptot = ptot + clustering[i][c]
+        xtot = xtot + mat[i][0]
+        ytot = ytot + mat[i][1]
         xRet = xRet + (clustering[i][c] * mat[i][0])
         #print(clustering[i][c])
         yRet = yRet + (clustering[i][c] * mat[i][1])
     #if(xtot == 0 or ytot == 0):
     #    print("aa")
     #    return([0, 0])
-    print(xRet, xtot)
+    #print(xRet, xtot)
     return([xRet/ptot, yRet/ptot])
 ###################################################################
 #Not used
@@ -116,13 +118,13 @@ def checkPrev(x_c, x_cPrev, c):
 ###################################################################
 n = 100
 cNum = 4
-mu = 0
-sigma = 0.1
+mu = 10
+sigma = 10
 mat = [] #points
 clustering = [] #Cluster assignment for points
 xmat = np.random.normal(mu, sigma, 100)
 ymat = np.random.normal(mu, sigma, 100)
-b= 0.1
+b= 0.5
 
 for i in range (0, n):
     #if (xmat[i]**2>=0.005 and ymat[i]**2>=0.005):
@@ -141,8 +143,14 @@ print(clustering)
 xc = []
 xcPrev = []
 
+xc.append([0,0])
+xc.append([10,10])
+xc.append([10,0])
+xc.append([0,10])
+
 for i in range (0, cNum):
-    xc.append([ round(rand.uniform(-0.3, 0.3), 2), round(rand.uniform(-0.3, 0.3), 2)])
+    #xc.append([ round(rand.uniform(-0.3, 0.3), 2), round(rand.uniform(-0.3, 0.3), 2)])
+    #xc.append([np.random.normal(mu, sigma, 1), np.random.normal(mu, sigma, 1)])
     #print(xc[i])
     xcPrev.append([])
 
@@ -159,8 +167,8 @@ cNum = len(xc)
 
 
 #while(checkConvergence(xc, cNum) == 0 or checkConvergence(xc, xcPrev, cNum) == 0):
-#while(checkPrev(xc, xcPrev, cNum) == 0):
-for a in range (0, 1):
+while(checkPrev(xc, xcPrev, cNum) == 0):
+#for a in range (0, 2):
     #print(xcPrev)
     print(xc)
 
@@ -181,8 +189,9 @@ for a in range (0, 1):
         #print(distList)
 
         for c in range (0, len(clustering[i])):
-            clustering[i][c] = clustering[i][c]/totalprob
-            #print(clustering[i][c])
+            if (totalprob != 0):
+                clustering[i][c] = clustering[i][c]/totalprob
+            print("cluster prob:", clustering[i][c])
 
         #print(mat[i])
     for c in range(0, cNum):
@@ -193,7 +202,7 @@ for a in range (0, 1):
 
 print(xc)
 
-print(clustering)
+#print(clustering)
 
 for i in range (0, nNum):
     minIndex = clustering[i].index(max(clustering[i]))
