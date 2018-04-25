@@ -111,15 +111,20 @@ def checkPrev(x_c, x_cPrev, c):
             ret = 0
     return(ret)
 ###################################################################
+#number of datapoints
 n = 100
+#number of clusters
 cNum = 4
+#Average value of datapoints
 mu = 0
+#distribution of datapoints
 sigma = 0.1
-mat = [] #points
+mat = [] #points, a 2d appray
 clustering = [] #Cluster assignment for points
 xmat = np.random.normal(mu, sigma, 100)
 ymat = np.random.normal(mu, sigma, 100)
 
+#Creates the matrix contaiing data points.
 for i in range (0, n):
     mat.append([xmat[i], ymat[i]])
     temp = []
@@ -132,9 +137,10 @@ for i in range (0, n):
 #mat = [[1, 0, -1], [2, 4, -1], [5, 5, -1], [10, 1, -1], [9, 2, -1], [6, 4, -1], [7, 9, -1]]
 #print(mat)
 
-xc = []
-xcPrev = []
+xc = [] #The current cluster position
+xcPrev = [] #The previosu cluster position, used to check if cluster position as changed
 
+#assigns cluster randomly
 for i in range (0, cNum):
     xc.append([rand.randrange(1), rand.randrange(1)])
     #print(xc[i])
@@ -153,36 +159,36 @@ cNum = len(xc)
 
 
 #while(checkConvergence(xc, cNum) == 0 or checkConvergence(xc, xcPrev, cNum) == 0):
-while(checkPrev(xc, xcPrev, cNum) == 0):
+while(checkPrev(xc, xcPrev, cNum) == 0): #Keeps running unless there are no changes in cluster positions
     #print(xcPrev)
     #print(xc)
 
+    #Saves cluster positions to compare later
     for i in range (0, cNum):
         xcPrev[i] = xc[i]
+    #For all data points
     for i in range (0, nNum):
-        distList = []
-        totalprob = 0;
+        distList = [] #Used to store the distances
         for c in range(0, cNum):
-            temp = getDist(mat[i], xc[c])
-            prob = soft(mat[i], xc[c], 100);
+            temp = getDist(mat[i], xc[c]) #temp varaible, holds distance
             #print(prob)
-            totalprob = totalprob + prob
             distList.append(temp)
             #print(temp)
         #print("total prob: ", totalprob)
         #print(distList)
-        minIndex = indexOf(distList, min(distList))
+        minIndex = indexOf(distList, min(distList)) #gets the index of the closest cluster
         #mat[i][2] = minIndex
-        for x in range (0, len(clustering[i])):
+        for x in range (0, len(clustering[i])): #writes 0 to every thing
             clustering[i][x] = 0
-        clustering[i][minIndex] = 1
+        clustering[i][minIndex] = 1 #sets minimum cluster index to 1
         #print(mat[i])
-    for c in range(0, cNum):
+    for c in range(0, cNum): #Updates cluster positions
         #print(c)
         xc[c] = centerOfGravity(mat, clustering, c)
         #print(xc[c])
     #print(xcPrev)
 
+#Plotting&graphinh
 for i in range (0, nNum):
     if(clustering[i][0] == 1):
         plt.plot(mat[i][0], mat[i][1], 'ro')

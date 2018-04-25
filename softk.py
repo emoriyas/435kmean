@@ -40,10 +40,10 @@ def getDist(x_i, x_c):
 
 def soft(x_i, x_c, b):
     expo = -1 * b * math.pow(getDist(x_i, x_c), 2)
-    print("expo:", expo)
+    #print("expo:", expo)
     #print("dist:", getDist(x_i, x_c))
     ret = math.exp(expo)
-    print("ret:", ret)
+    #print("ret:", ret)
     return(ret)
 
 ###################################################################
@@ -116,33 +116,39 @@ def checkPrev(x_c, x_cPrev, c):
             ret = 0
     return(ret)
 ###################################################################
+#number of datapoints
 n = 100
+#number of clusters
 cNum = 4
+#Average value of datapoints
 mu = 10
+#distribution of datapoints
 sigma = 10
 mat = [] #points
 clustering = [] #Cluster assignment for points
 xmat = np.random.normal(mu, sigma, 100)
 ymat = np.random.normal(mu, sigma, 100)
-b= 0.5
+b= 1
 
+#Creates the matrix contaiing data points.
 for i in range (0, n):
     #if (xmat[i]**2>=0.005 and ymat[i]**2>=0.005):
     #    mat.append([xmat[i], ymat[i], -1])
-    mat.append([xmat[i], ymat[i]])
+    mat.append([xmat[i], ymat[i]]) #adds something like [1, 2]
     temp = []
     for c in range (0, cNum):
         temp.append(0)
     #print(temp)
-    clustering.append(temp)
+    clustering.append(temp) #adds something like [0, 0, 0, 0]
 
 print(clustering)
 #mat = [[1, 0, -1], [2, 4, -1], [5, 5, -1], [10, 1, -1], [9, 2, -1], [6, 4, -1], [7, 9, -1]]
 #print(mat)
 
-xc = []
-xcPrev = []
+xc = [] #The current cluster position
+xcPrev = [] #The previosu cluster position, used to check if cluster position as changed
 
+#Right now, I hard coded the cluster positions. You can assign cluster randomly however you want
 xc.append([0,0])
 xc.append([10,10])
 xc.append([10,0])
@@ -167,18 +173,23 @@ cNum = len(xc)
 
 
 #while(checkConvergence(xc, cNum) == 0 or checkConvergence(xc, xcPrev, cNum) == 0):
-while(checkPrev(xc, xcPrev, cNum) == 0):
+iteration = 0
+ #Keeps running unless there are no changes in cluster positions or until it iterates after a certain point
+while(checkPrev(xc, xcPrev, cNum) == 0 or iteration < 20):
+    iteration = iteration + 1
 #for a in range (0, 2):
     #print(xcPrev)
-    print(xc)
+    #print(xc)
 
+    #Saves cluster positions to compare later
     for i in range (0, cNum):
         xcPrev[i] = xc[i]
+    #For all data points
     for i in range (0, nNum):
-        totalprob = 0;
+        totalprob = 0 #total probability, used to ensure that sum of all probabilities = 1
         for c in range(0, cNum):
-            temp = getDist(mat[i], xc[c])
-            prob = soft(mat[i], xc[c], b);
+            temp = getDist(mat[i], xc[c]) #temp variable, holds distance
+            prob = soft(mat[i], xc[c], b); #use softk to get probability of belonging to a cluster
             #print(prob)
             clustering[i][c] = prob
             #print(xc)
@@ -187,14 +198,13 @@ while(checkPrev(xc, xcPrev, cNum) == 0):
             #print(temp)
         #print("total prob: ", totalprob)
         #print(distList)
-
         for c in range (0, len(clustering[i])):
             if (totalprob != 0):
-                clustering[i][c] = clustering[i][c]/totalprob
-            print("cluster prob:", clustering[i][c])
+                clustering[i][c] = clustering[i][c]/totalprob #divides each probability to the total prob
+            #print("cluster prob:", clustering[i][c])
 
         #print(mat[i])
-    for c in range(0, cNum):
+    for c in range(0, cNum): #Updates cluster positions
         #print(c)
         xc[c] = centerOfGravity(mat, clustering, c)
         #print(xc[c])
